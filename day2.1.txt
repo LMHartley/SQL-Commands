@@ -1,0 +1,104 @@
+
+SQLcl: Release 4.2.0.16.153.2014 RC on Wed May 22 10:20:45 2019
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Username? (''?) hr
+Password? (**********?) *****
+  USER          = hr
+  URL           = jdbc:oracle:oci8:@(DESCRIPTION =    (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))    (CONNECT_DATA =      (SERVER = DEDICATED)      (SERVICE_NAME = orcl)    )  )
+  Error Message = ORA-01017: invalid username/password; logon denied
+  USER          = hr
+  URL           = jdbc:oracle:thin:@(DESCRIPTION =    (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))    (CONNECT_DATA =      (SERVER = DEDICATED)      (SERVICE_NAME = orcl)    )  )
+  Error Message = ORA-01017: invalid username/password; logon denied
+Username? (RETRYING) ('hr/*********'?) hr
+Password? (RETRYING) (**********?) ******
+Last Successful login time: Wed May 22 2019 10:20:57 -04:00
+
+Connected to:
+Oracle Database 12c Enterprise Edition Release 12.1.0.2.0 - 64bit Production
+With the Partitioning, OLAP, Advanced Analytics and Real Application Testing options
+
+
+SQL> describe bank
+Name     Null? Type     
+-------- ----- -------- 
+ACCNO          CHAR(10) 
+NAME           CHAR(10) 
+
+SQL> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SQL> create or replace procedure createbankacc(name char,postcode char,acctype char,city char)
+  2  is
+  3  begin
+  4  insert into bank values((
+  5  select upper(substr(acctype,1,1))||
+  6  upper(substr(city,1,1))||
+  7  lpad(nvl(max(substr(accno,3,3))+1,1),3,'0')
+  8  from bank where substr(accno,1,1)
+  9  =upper(substr(acctype,1,1))),
+ 10  name,postcode);
+ 11  end;
+ 12* /
+Procedure CREATEBANKACC compiled
+
+SQL> set serveroutput on;
+SQL> call createbankacc('John','SN27WB','Savings','Swindon');
+
+Call completed.
+
+SQL> select * from bank;
+
+ACCNO      NAME       POSTCODE  
+---------- ---------- ----------
+SS001      John       SN27WB    
+
+SQL> check errors;
+
+Error starting at line : 1 in command -
+check errors
+Error report -
+Unknown Command
+
+SQL> show errors;
+
+
+SQL> call createbankacc('Dave','SN38WX','Current','Swindon');
+Call completed.
+
+
+SQL> select * from bank;
+
+ACCNO      NAME       POSTCODE  
+---------- ---------- ----------
+SS001      John       SN27WB    
+CS001      Dave       SN38WX    
+
+
+SQL> call createbankacc('Gary','SN19AR','Current','Swindon');
+Call completed.
+
+
+SQL> select * from bank;
+
+ACCNO      NAME       POSTCODE  
+---------- ---------- ----------
+SS001      John       SN27WB    
+CS001      Dave       SN38WX    
+CS002      Gary       SN19AR    
+
+SQL> 
+
