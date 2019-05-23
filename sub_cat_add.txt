@@ -1,0 +1,17 @@
+create or replace procedure sub_cat_add(cat char,sub char)
+is
+newSID number(3);
+newCID number(3);
+begin
+select nvl(max(cid),0) into newCID from category where description=cat;
+if newCID=0 then
+call cat_add(cat);
+end if;
+select nvl(max(sid),0) into newSID from sub_category where description=sub;
+if newSID=0 then
+select nvl(max(sid),0)+10 into newSID from sub_category;
+insert into sub_category values(newCID,newSID,sub);
+end if;
+end;
+ /
+
