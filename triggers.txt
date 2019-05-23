@@ -1,0 +1,11 @@
+create or replace trigger school_edit
+  2  before insert on school
+  3  for each row
+  4  begin
+  5  if :new.marks=59 then
+  6  :new.marks:=60;
+  7  end if;
+  8  :new.name:=upper(:new.name);
+  9  end;
+
+
